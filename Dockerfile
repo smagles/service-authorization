@@ -10,6 +10,6 @@ RUN ./gradlew build
 
 FROM openjdk:17-alpine
 
-COPY --from=build /build/libs/service-auth-0.0.1.jar /app/service-auth-0.0.1.jar
+COPY --from=build /build/libs/service-authorization-1.0-SNAPSHOT.jar /app/service-authorization-1.0-SNAPSHOT.jar
 
-CMD ["java", "-jar", "app/service-auth-0.0.1.jar"]
+CMD ["java", "-jar", "app/service-authorization-1.0-SNAPSHOT.jar"]
