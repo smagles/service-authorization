@@ -35,12 +35,12 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((auth) -> auth
-                        //.requestMatchers("/validate").permitAll()
-                        //.requestMatchers("/get_token").permitAll()
+                        .requestMatchers("/auth/registration").permitAll()
+                        .requestMatchers("/auth/auth").permitAll()
+                        .requestMatchers("/auth/validate").hasAnyRole(RoleList.USER.name(), RoleList.ADMIN.name())
                         .requestMatchers("/check").hasRole(RoleList.USER.name())
-                        .requestMatchers("/validate").hasAnyRole(RoleList.USER.name(), RoleList.ADMIN.name())
                         .requestMatchers("/admin").hasRole(RoleList.ADMIN.name())
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }

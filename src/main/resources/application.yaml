@@ -12,3 +12,5 @@ spring:
 jwt:
   secret: ${SECRET_KEY}
   lifetime: 30m
+server:
+  port: 80

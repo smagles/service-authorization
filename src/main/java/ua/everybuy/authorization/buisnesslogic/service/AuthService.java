@@ -42,7 +42,7 @@ public class AuthService {
 
         return ResponseEntity.ok(StatusResponse.builder()
                 .status(HttpStatus.OK.value())
-                .data(token)
+                .data(new TokenResponse(token))
                 .build());
     }
 
@@ -60,7 +60,7 @@ public class AuthService {
 
         return ResponseEntity.ok(StatusResponse.builder()
                 .status(HttpStatus.OK.value())
-                .data(token)
+                .data(new TokenResponse(token))
                 .build());
     }
 }

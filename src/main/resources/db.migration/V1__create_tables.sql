@@ -85,3 +85,4 @@ create table auth.sms_code
     at       timestamp default now() not null
 );
 
+insert into auth.roles(name) values ('USER'), ('ADMIN')
