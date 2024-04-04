@@ -27,19 +27,18 @@ public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                //.cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests((auth) -> auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/registration").permitAll()
                         .requestMatchers("/auth/auth").permitAll()
-                        .requestMatchers("/auth/validate").hasAnyRole(RoleList.USER.name(), RoleList.ADMIN.name())
-                        .requestMatchers("/check").hasRole(RoleList.USER.name())
-                        .requestMatchers("/admin").hasRole(RoleList.ADMIN.name())
+                        .requestMatchers("/auth/validate")
+                            .hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
         return http.build();
