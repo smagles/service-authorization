@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ua.everybuy.authorization.routing.dtos.AuthRequest;
-import ua.everybuy.authorization.routing.dtos.RegistrationRequest;
+import ua.everybuy.authorization.routing.dtos.*;
 import ua.everybuy.authorization.buisnesslogic.service.AuthService;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("auth")
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<?> validate() {
-        return ResponseEntity.ok(true);
+    public ResponseEntity<?> validate(Principal principal) {
+        return authService.validate(principal.getName());
     }
 }

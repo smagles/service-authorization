@@ -3,12 +3,15 @@ package ua.everybuy.authorization.buisnesslogic.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.everybuy.authorization.database.entity.User;
 import ua.everybuy.authorization.routing.dtos.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +64,18 @@ public class AuthService {
         return ResponseEntity.ok(StatusResponse.builder()
                 .status(HttpStatus.OK.value())
                 .data(new TokenResponse(token))
+                .build());
+    }
+
+    public ResponseEntity<?> validate(String login) {
+        User user = userService.getUserByLogin(login).orElseThrow();
+        List<String> rolesList = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(StatusResponse.builder()
+                .status(HttpStatus.OK.value())
+                .data(new ValidResponse(!user.isBlock(), user.getId(), user.getUsername(), user.getPhoneNumber(), rolesList))
                 .build());
     }
 }
