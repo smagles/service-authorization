@@ -1,25 +1,18 @@
 package ua.everybuy.authorization.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ua.everybuy.authorization.buisnesslogic.service.JwtServiceUtils;
-import ua.everybuy.authorization.errorhandling.ExpiredTokenException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
