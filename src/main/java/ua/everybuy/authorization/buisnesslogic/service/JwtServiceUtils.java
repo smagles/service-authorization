@@ -21,10 +21,8 @@ import java.util.stream.Collectors;
 public class JwtServiceUtils {
     @Value("${jwt.secret}")
     private String secretKeyString;
-
     @Value("${jwt.lifetime}")
     private Duration jwtLifetime;
-
     private SecretKey secretKey;
 
 //    JwtServiceUtils() {

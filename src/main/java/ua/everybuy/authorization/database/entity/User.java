@@ -27,7 +27,7 @@ public class User implements UserDetails {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
     @Basic
-    @Column(name = "registration_at", insertable = false, nullable = true)
+    @Column(name = "registration_at", insertable = false, updatable = false, nullable = true)
     private Timestamp registrationAt;
     @Basic
     @Column(name = "phone_number", nullable = false, length = 12)
@@ -88,7 +88,4 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Role> roles;
-
-//    @Formula("'+380' + 'phone_number'")
-//    private String fullNumber;
 }

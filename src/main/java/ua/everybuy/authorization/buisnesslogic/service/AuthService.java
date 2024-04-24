@@ -50,7 +50,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> authorization(AuthRequest authRequest) {
-        Optional<User> user = userService.getUserByLogin(authRequest.getLogin());
+        Optional<User> user = userService.getOUserByEmail(authRequest.getLogin());
         String token;
 
         if (user.isEmpty() || !passwordEncoder.matches(authRequest.getPassword(), user.get().getPasswordHash())) {
@@ -68,7 +68,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> validate(String login) {
-        User user = userService.getUserByLogin(login).orElseThrow();
+        User user = userService.getUserByEmail(login);
         List<String> rolesList = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
