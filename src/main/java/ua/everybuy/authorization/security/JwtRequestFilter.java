@@ -1,10 +1,13 @@
 package ua.everybuy.authorization.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,18 +32,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
-            //try {
+            try {
                 email = jwtServiceUtils.getEmail(jwt);
-//            } catch (ExpiredJwtException e) {
-//                //logger.debug("Время жизни токена вышло");
-//                //throw new ExpiredTokenException("Время жизни токена вышло");
-//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Время жизни токена вышло");
-//                //throw new ServletException("ServletException");
-//            }
-//            } catch (SignatureException e) {  //TODO
-//                //logger.debug("Подпись неправильная");
-//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Неверный токен");
-//            }
+            } catch (ExpiredJwtException e) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().write("{\"status\": 401, \"data\": {\"message\": \"Token lifetime has expired!\"}}");
+                response.setContentType("application/json");
+                return;
+            } catch (SignatureException e) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().write("{\"status\": 401, \"data\": {\"message\": \"Token invalid!\"}}");
+                response.setContentType("application/json");
+                return;
+            }
         }
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
