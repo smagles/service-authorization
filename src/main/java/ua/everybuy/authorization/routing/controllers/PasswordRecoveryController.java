@@ -3,7 +3,7 @@ package ua.everybuy.authorization.routing.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,12 +17,12 @@ import ua.everybuy.authorization.routing.dtos.LoginRequest;
 public class PasswordRecoveryController {
     private final PasswordRecoveryService service;
 
-    @GetMapping("/get-recovery-code")
+    @PostMapping("/get-recovery-code")
     public ResponseEntity<?> getRecovery(@RequestBody @Valid LoginRequest loginRequest) {
         return service.sendCode(loginRequest.getLogin());
     }
 
-    @GetMapping("/recovery-password")
+    @PostMapping("/recovery-password")
     public ResponseEntity<?> recoveryPassword(@RequestBody @Valid CodeRequest codeRequest) {
         return service.recoveryPassword(codeRequest);
     }
