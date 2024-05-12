@@ -36,11 +36,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/auth",
                                 "/auth/registration",
-                                "/auth/getRecoverySms").permitAll()
+                                "/auth/get-recovery-code",
+                                "/auth/recovery-password").permitAll()
                         .requestMatchers("/auth/validate",
-                                "/auth/changeEmail",
-                                "/auth/changePhoneNumber",
-                                "/auth/changePassword")
+                                "/auth/change-email",
+                                "/auth/change-phone-number",
+                                "/auth/change-password")
                         .hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
                         .anyRequest().authenticated());
         return http.build();

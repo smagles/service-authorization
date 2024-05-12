@@ -17,19 +17,19 @@ import java.security.Principal;
 public class ChangeController {
     private final UserService service;
 
-    @PutMapping("/changeEmail")
+    @PutMapping("/change-email")
     public ResponseEntity<?> changeEmail(Principal principal,
                                          @RequestBody @Valid ChangeEmailRequest changeEmailRequest) {
         return service.changeEmail(principal.getName(), changeEmailRequest);
     }
 
-    @PutMapping("/changePhoneNumber")
+    @PutMapping("/change-phone-number")
     public ResponseEntity<?> changePhoneNumber(Principal principal,
                                                @RequestBody @Valid ChangePhoneRequest changePhoneRequest) {
         return service.changePhoneNumber(principal.getName(), changePhoneRequest);
     }
 
-    @PutMapping("/changePassword")
+    @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(Principal principal,
                                             @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return service.changePassword(principal.getName(), changePasswordRequest);
