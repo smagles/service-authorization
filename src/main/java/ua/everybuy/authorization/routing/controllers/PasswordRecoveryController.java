@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ua.everybuy.authorization.buisnesslogic.service.PasswordRecoveryService;
-import ua.everybuy.authorization.routing.dtos.CodeRequest;
+import ua.everybuy.authorization.routing.dtos.RecoveryRequest;
 import ua.everybuy.authorization.routing.dtos.LoginRequest;
 
 @RestController
@@ -23,7 +23,7 @@ public class PasswordRecoveryController {
     }
 
     @PostMapping("/recovery-password")
-    public ResponseEntity<?> recoveryPassword(@RequestBody @Valid CodeRequest codeRequest) {
-        return service.recoveryPassword(codeRequest);
+    public ResponseEntity<?> recoveryPassword(@RequestBody @Valid RecoveryRequest recoveryRequest) {
+        return service.recoveryPassword(recoveryRequest);
     }
 }

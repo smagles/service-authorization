@@ -109,6 +109,15 @@ public class UserService implements UserDetailsService {
                 .build());
     }
 
+    public User setNewPassword(User user, String pass) {
+        user.setPasswordHash(passwordEncoder.encode(pass));
+        return user;
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
     public boolean existsUserWithEmail(String email) {
         return userRepository.existsByEmail(email);
     }

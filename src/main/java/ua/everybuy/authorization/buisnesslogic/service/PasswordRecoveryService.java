@@ -38,7 +38,8 @@ public class PasswordRecoveryService {
 
             return ResponseEntity.ok(StatusResponse.builder()
                     .status(HttpStatus.OK.value())
-                    .data("An email has been sent to " + user.getEmail() + " with a recovery code. Please use this code to reset your password.") //TODO
+                    .data("An email has been sent to " + user.getEmail()
+                            + " with a recovery code. Please use this code to reset your password.")
                     .build());
         } else {
             // send sms //TODO
@@ -50,8 +51,8 @@ public class PasswordRecoveryService {
                 .build());
     }
 
-    public ResponseEntity<?> recoveryPassword(CodeRequest codeRequest) {
-        Optional<User> oUser =  userService.getOUserByEmail(codeRequest.getLogin());
+    public ResponseEntity<?> recoveryPassword(RecoveryRequest recoveryRequest) {
+        Optional<User> oUser =  userService.getOUserByEmail(recoveryRequest.getLogin());
         User user;
         Optional<SmsCode> oSmsCode;
         SmsCode smsCode;
@@ -59,7 +60,7 @@ public class PasswordRecoveryService {
         if (oUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                            new MessageResponse("User " + codeRequest.getLogin() + " not found!")));
+                            new MessageResponse("User " + recoveryRequest.getLogin() + " not found!")));
         }
 
         user = oUser.get();
@@ -73,7 +74,7 @@ public class PasswordRecoveryService {
 
         smsCode = oSmsCode.get();
 
-        if (!Objects.equals(smsCode.getCode(), codeRequest.getCode())) {
+        if (!Objects.equals(smsCode.getCode(), recoveryRequest.getCode())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
                             new MessageResponse("Wrong code!")));
@@ -87,6 +88,8 @@ public class PasswordRecoveryService {
                             new MessageResponse("Your password reset code has expired!")));
         }
 
+        userService.setNewPassword(user, recoveryRequest.getNewPassword());
+        userService.saveUser(user);
         smsCodeService.removeSmsCode(smsCode);
 
         return ResponseEntity.ok(StatusResponse.builder()
