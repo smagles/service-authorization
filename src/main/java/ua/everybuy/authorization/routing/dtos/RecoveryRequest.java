@@ -13,8 +13,8 @@ public class RecoveryRequest {
     @NotNull
     @Pattern(message = "code should be valid (4 numbers)", regexp = "^\\d{4}$")
     private String code;
-    @NotNull
-    @Pattern(message = "password should be valid",
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[~`!@#$%^&*()_\\-+={\\[}\\]|\\\\:\";'<>?,./])[a-zA-Z0-9~`!@#$%^&*()_\\-+={\\[}\\]|\\\\:\";'<>?,./]{8,25}$")
-    private String newPassword;
+//    @NotNull
+//    @Pattern(message = "password should be valid",
+//            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[~`!@#$%^&*()_\\-+={\\[}\\]|\\\\:\";'<>?,./])[a-zA-Z0-9~`!@#$%^&*()_\\-+={\\[}\\]|\\\\:\";'<>?,./]{8,25}$")
+//    private String newPassword;
 }

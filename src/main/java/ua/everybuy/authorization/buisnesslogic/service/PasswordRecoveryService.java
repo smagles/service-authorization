@@ -10,6 +10,7 @@ import ua.everybuy.authorization.routing.dtos.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,15 @@ public class PasswordRecoveryService {
     private final UserService userService;
     private final JwtServiceUtils jwtServiceUtils;
     private final EmailService emailService;
+    private static final short ASCII_CHARS_START = 33;
+    private static final short ASCII_CHARS_COUNT = 93;
+    private static final short ASCII_NUMBERS_START = 48;
+    private static final short ASCII_NUMBERS_COUNT = 10;
+    private static final short ASCII_UPPERCASE_START = 65;
+    private static final short ASCII_LOWERCASE_START = 97;
+    private static final short ASCII_LETTERS_COUNT = 25;
+    private static final String ASCII_SPECIALS = "~`!@#$%^&*()_\\-+={\\[}\\]|\\\\:\";'<>?,./";
+
 
     public ResponseEntity<?> sendCode(String login) {
         Optional<User> oUser =  userService.getOUserByEmail(login);
@@ -56,6 +66,7 @@ public class PasswordRecoveryService {
         User user;
         Optional<SmsCode> oSmsCode;
         SmsCode smsCode;
+        String newPass;
 
         if (oUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -88,7 +99,11 @@ public class PasswordRecoveryService {
                             new MessageResponse("Your password reset code has expired!")));
         }
 
-        userService.setNewPassword(user, recoveryRequest.getNewPassword());
+        newPass = genePass();
+
+        emailService.sendEmail(user.getEmail(), "New password", newPass);
+
+        userService.setNewPassword(user, newPass);
         userService.saveUser(user);
         smsCodeService.removeSmsCode(smsCode);
 
@@ -96,5 +111,23 @@ public class PasswordRecoveryService {
                 .status(HttpStatus.OK.value())
                 .data(new TokenResponse(jwtServiceUtils.generateToken(user)))
                 .build());
+    }
+
+    private String genePass() {
+        StringBuilder pass = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < 4; i++) {
+            pass.append((char) (random.nextInt(ASCII_CHARS_COUNT) + ASCII_CHARS_START));
+        }
+        pass.insert(random.nextInt(pass.length()),
+                (char) (random.nextInt(ASCII_NUMBERS_COUNT) + ASCII_NUMBERS_START));
+        pass.insert(random.nextInt(pass.length()),
+                (char) (random.nextInt(ASCII_LETTERS_COUNT) + ASCII_UPPERCASE_START));
+        pass.insert(random.nextInt(pass.length()),
+                (char) (random.nextInt(ASCII_LETTERS_COUNT) + ASCII_LOWERCASE_START));
+        pass.insert(random.nextInt(pass.length()), ASCII_SPECIALS.charAt(random.nextInt(ASCII_SPECIALS.length())));
+
+        return pass.toString();
     }
 }
