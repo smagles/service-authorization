@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class RecoveryRequest {
     @NotNull
+    @Pattern(message = "login must be email or phone (9 numbers)",
+            regexp = "^[a-z0-9_+&*-]+(?:\\.[a-z0-9_+&*-]+)*@(?:[a-z0-9-]+\\.)+[a-z]{2,7}$|^\\d{9}$")
     private String login;
     @NotNull
     @Pattern(message = "code should be valid (4 numbers)", regexp = "^\\d{4}$")

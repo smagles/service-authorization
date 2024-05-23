@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 public class AuthRequest {
     @NotNull
-    //@Pattern(message = "email should be valid", regexp = "^(?:\\d{9}|[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7})$")
+    @Pattern(message = "login must be email or phone (9 numbers)",
+            regexp = "^[a-z0-9_+&*-]+(?:\\.[a-z0-9_+&*-]+)*@(?:[a-z0-9-]+\\.)+[a-z]{2,7}$|^\\d{9}$")
     private String login;
     @NotNull
     @Pattern(message = "password should be valid",
