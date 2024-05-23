@@ -8,7 +8,7 @@ import ua.everybuy.authorization.database.repository.SmsCodeRepository;
 
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Random;
 
@@ -28,7 +28,7 @@ public class SmsCodeService {
         if (smsCode.getUsersId() == 0) {
             smsCode.setUsersId(userId);
         }
-        smsCode.setAt(new Timestamp(System.currentTimeMillis()));
+        smsCode.setAt(Timestamp.from(Instant.now()));
         smsCode.setCode(code);
         smsCodeRepository.save(smsCode);
 
@@ -40,8 +40,7 @@ public class SmsCodeService {
     }
 
     public boolean isSmsCodeActual(SmsCode smsCode) {
-        Date expired = new Date((new Date()).getTime() + smsCodeLifetime.toMillis());
-        return smsCode.getAt().before(expired);
+        return smsCode.getAt().toInstant().plus(smsCodeLifetime).isAfter(Instant.now());
     }
 
     private String genCode(int length) {
