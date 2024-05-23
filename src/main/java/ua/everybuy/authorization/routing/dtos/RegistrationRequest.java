@@ -11,7 +11,7 @@ import lombok.Setter;
 public class RegistrationRequest {
     @NotNull
     @Email(message = "email should be valid",
-            regexp = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")
+            regexp = "^[a-z0-9_+&*-]+(?:\\.[a-z0-9_+&*-]+)*@(?:[a-z0-9-]+\\.)+[a-z]{2,7}$")
     private String email;
     @NotNull
     @Pattern(message = "phone should be valid (9 numbers)", regexp = "^\\d{9}$")

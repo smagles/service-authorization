@@ -35,8 +35,8 @@ public class PasswordRecoveryService {
         String code;
 
         if (oUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
                             new MessageResponse("User " + login + " not found!")));
         }
 
@@ -69,8 +69,8 @@ public class PasswordRecoveryService {
         String newPass;
 
         if (oUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
                             new MessageResponse("User " + recoveryRequest.getLogin() + " not found!")));
         }
 

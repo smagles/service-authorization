@@ -12,6 +12,6 @@ public class ChangeEmailRequest {
     private String password;
     @NotNull
     @Email(message = "email should be valid",
-            regexp = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")
+            regexp = "^[a-z0-9_+&*-]+(?:\\.[a-z0-9_+&*-]+)*@(?:[a-z0-9-]+\\.)+[a-z]{2,7}$")
     private String newEmail;
 }
