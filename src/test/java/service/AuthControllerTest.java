@@ -1,8 +1,7 @@
 package service;
 
 import static config.TestDataFactory.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -18,10 +17,9 @@ import ua.everybuy.authorization.buisnesslogic.service.AuthService;
 import ua.everybuy.authorization.buisnesslogic.service.JwtServiceUtils;
 import ua.everybuy.authorization.buisnesslogic.service.UserService;
 import ua.everybuy.authorization.database.entity.User;
-import ua.everybuy.authorization.routing.dtos.ErrorResponse;
-import ua.everybuy.authorization.routing.dtos.RegistrationRequest;
-import ua.everybuy.authorization.routing.dtos.StatusResponse;
-import ua.everybuy.authorization.routing.dtos.TokenResponse;
+import ua.everybuy.authorization.routing.dtos.*;
+
+import java.util.Optional;
 
 public class AuthControllerTest {
 
@@ -52,7 +50,7 @@ public class AuthControllerTest {
         ResponseEntity<?> response = authService.registration(request);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertTrue(((ErrorResponse) response.getBody()).getError().getMessage().contains("Email " + EMAIL + " already in use"));
+        assertEquals("Email " + EMAIL + " already in use;", ((ErrorResponse) response.getBody()).getError().getMessage());
     }
 
     @Test
@@ -65,7 +63,7 @@ public class AuthControllerTest {
         ResponseEntity<?> response = authService.registration(request);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertTrue(((ErrorResponse) response.getBody()).getError().getMessage().contains("Phone " + PHONE + " already in use"));
+        assertEquals("Phone " + PHONE + " already in use;", ((ErrorResponse) response.getBody()).getError().getMessage());
     }
 
     @Test
@@ -77,11 +75,67 @@ public class AuthControllerTest {
         when(userService.existsUserWithPhone(PHONE)).thenReturn(false);
         when(passwordEncoder.encode("P@ssw0rd")).thenReturn("encodedPassword");
         when(userService.createNewUser(any(User.class))).thenReturn(newUser);
-        when(jwtServiceUtils.generateToken(newUser)).thenReturn("jwtToken");
+        when(jwtServiceUtils.generateToken(newUser)).thenReturn(TOKEN);
 
         ResponseEntity<?> response = authService.registration(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("jwtToken", ((TokenResponse) ((StatusResponse) response.getBody()).getData()).getToken());
+        assertEquals(TOKEN, ((TokenResponse) ((StatusResponse) response.getBody()).getData()).getToken());
+    }
+
+    @Test
+    public void testAuthorizationSuccess() {
+        AuthRequest authRequest = getAuthRequestSupplier.get();
+        Optional<User> oUser = Optional.of(getUserSupplier.get());
+        User user = oUser.get();
+
+        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+        when(passwordEncoder.matches(authRequest.getPassword(), user.getPasswordHash())).thenReturn(true);
+        when(jwtServiceUtils.generateToken(user)).thenReturn(TOKEN);
+
+        ResponseEntity<?> response = authService.authorization(authRequest);
+
+        assertNotNull(response);
+        assertEquals(TOKEN, ((TokenResponse) ((StatusResponse) response.getBody()).getData()).getToken());
+    }
+
+    @Test
+    public void testAuthorizationInvalidPassword() {
+        AuthRequest authRequest = getAuthRequestSupplier.get();
+        Optional<User> oUser = Optional.of(getUserSupplier.get());
+        User user = oUser.get();
+
+        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+        when(passwordEncoder.matches(authRequest.getPassword(), user.getPasswordHash())).thenReturn(false);
+
+        ResponseEntity<?> response = authService.authorization(authRequest);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("User " + EMAIL + " not found or wrong password!", ((ErrorResponse) response.getBody()).getError().getMessage());
+    }
+
+    @Test
+    public void testAuthorizationUserNotFound() {
+        AuthRequest authRequest = getAuthRequestSupplier.get();
+        Optional<User> oUser = Optional.empty();
+
+        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+
+        ResponseEntity<?> response = authService.authorization(authRequest);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("User " + EMAIL + " not found or wrong password!", ((ErrorResponse) response.getBody()).getError().getMessage());
+    }
+
+    @Test
+    public void testValidateTokenSuccess() {
+        User user = getUserSupplier.get();
+
+        when(userService.getUserByEmail(EMAIL)).thenReturn(user);
+
+        ResponseEntity<?> response = authService.validate(EMAIL);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("USER", ((ValidResponse) ((StatusResponse) response.getBody()).getData()).getRoles().get(0));
     }
 }
