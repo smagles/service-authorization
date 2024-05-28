@@ -12,6 +12,8 @@ import ua.everybuy.authorization.database.entity.User;
 import ua.everybuy.authorization.database.repository.UserRepository;
 import ua.everybuy.authorization.routing.dtos.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +113,7 @@ public class UserService implements UserDetailsService {
 
     public User setNewPassword(User user, String pass) {
         user.setPasswordHash(passwordEncoder.encode(pass));
+        user.setPasswordResetAt(Timestamp.from(Instant.now()));
         return user;
     }
 
