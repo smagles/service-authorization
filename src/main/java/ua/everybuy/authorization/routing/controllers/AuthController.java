@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ua.everybuy.authorization.routing.dtos.*;
 import ua.everybuy.authorization.buisnesslogic.service.AuthService;
+import ua.everybuy.authorization.routing.dtos.AuthRequest;
+import ua.everybuy.authorization.routing.dtos.RegistrationRequest;
 
 import java.security.Principal;
 
