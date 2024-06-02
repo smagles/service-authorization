@@ -46,7 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/validate",
                                 "/auth/change-email",
                                 "/auth/change-phone-number",
-                                "/auth/change-password")
+                                "/auth/change-password",
+                                "/auth/get-phone")
                         .hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
                         .anyRequest().authenticated())
                 .exceptionHandling(basic -> basic.authenticationEntryPoint(customAuthenticationEntryPoint));

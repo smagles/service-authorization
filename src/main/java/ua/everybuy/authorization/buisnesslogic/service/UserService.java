@@ -117,6 +117,21 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public ResponseEntity<?> getPhone(long userId) {
+        Optional<User> oUser = userRepository.findById(userId);
+
+        if (oUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
+                            new MessageResponse("User with user id: " + userId + " not found!")));
+        }
+
+        return ResponseEntity.ok(StatusResponse.builder()
+                .status(HttpStatus.OK.value())
+                .data(new PhoneResponse(oUser.get().getPhoneNumber()))
+                .build());
+    }
+
     public void saveUser(User user) {
         userRepository.save(user);
     }
