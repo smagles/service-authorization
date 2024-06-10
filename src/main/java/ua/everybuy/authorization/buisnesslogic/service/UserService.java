@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
         if (existsUserWithEmail(changeEmailRequest.getNewEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(HttpStatus.CONFLICT.value(),
-                            new MessageResponse("Email " + changeEmailRequest.getNewEmail() + " already taken")));
+                            new MessageResponse("Email " + changeEmailRequest.getNewEmail() + " is already taken")));
         }
 
         user.setEmail(changeEmailRequest.getNewEmail());
@@ -81,7 +81,7 @@ public class UserService implements UserDetailsService {
         if (existsUserWithPhone(changePhoneRequest.getNewPhoneNumber())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(HttpStatus.CONFLICT.value(),
-                            new MessageResponse("Phone number " + changePhoneRequest.getNewPhoneNumber() + " already taken")));
+                            new MessageResponse("Phone number " + changePhoneRequest.getNewPhoneNumber() + " is already taken")));
         }
 
         user.setPhoneNumber(changePhoneRequest.getNewPhoneNumber());

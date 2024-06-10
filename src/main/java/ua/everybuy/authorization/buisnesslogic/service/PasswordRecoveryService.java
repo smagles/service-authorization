@@ -133,17 +133,14 @@ public class PasswordRecoveryService {
 
             return ResponseEntity.ok(StatusResponse.builder()
                     .status(HttpStatus.OK.value())
-                    .data("An email has been sent to " + user.getEmail()
-                            + " with a recovery code. Please use this code to reset your password.")
+                    .data(new MessageResponse("An email has been sent to " + user.getEmail()
+                            + " with a recovery code. Please use this code to reset your password."))
                     .build());
-        } else {
-            // send sms //TODO
-        }
+        } //TODO send sms
 
-        return ResponseEntity.ok(StatusResponse.builder()
-                .status(HttpStatus.OK.value())
-                .data("This endpoint is not available at this time.") //TODO
-                .build());
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .body(new ErrorResponse(HttpStatus.NOT_IMPLEMENTED.value(),
+                        new MessageResponse("Password recovery by phone number is not implemented.")));
     }
 
     public ResponseEntity<?> recoveryPassword(RecoveryRequest recoveryRequest) {
