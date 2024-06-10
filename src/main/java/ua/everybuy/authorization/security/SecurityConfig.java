@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 "/auth/get-recovery-code",
                                 "/auth/recovery-password",
                                 "/swagger-ui/**",
-                                "/v3/**").permitAll()
+                                "/v3/api-docs/**").permitAll()
                         .requestMatchers("/auth/validate",
                                 "/auth/change-email",
                                 "/auth/change-phone-number",
