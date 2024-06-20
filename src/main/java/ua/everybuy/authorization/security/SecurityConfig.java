@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/auth/registration",
                                 "/auth/get-recovery-code",
                                 "/auth/recovery-password",
+                                "/auth/keep-alive",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**").permitAll()
                         .requestMatchers("/auth/validate",
