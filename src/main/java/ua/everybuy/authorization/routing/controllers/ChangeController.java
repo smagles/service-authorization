@@ -99,6 +99,10 @@ public class ChangeController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - User not found or wrong password or invalid token",
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 401, \"error\": { \"message\": \"...\" } }")
+                    ) }),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = { @Content(mediaType = "application/json",
+                            examples = @ExampleObject("{ \"status\": 404, \"error\": { \"message\": \"... not found!\" } }")
                     ) })
     })
     @PutMapping("/change-password")
