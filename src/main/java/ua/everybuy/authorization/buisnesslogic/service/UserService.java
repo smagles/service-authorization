@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ua.everybuy.authorization.database.entity.SmsCode;
 import ua.everybuy.authorization.database.entity.User;
 import ua.everybuy.authorization.database.repository.UserRepository;
 import ua.everybuy.authorization.routing.dtos.*;
@@ -15,6 +16,7 @@ import ua.everybuy.authorization.routing.dtos.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,8 @@ public class UserService implements UserDetailsService {
     private final RoleService roleService;
     private final JwtServiceUtils jwtServiceUtils;
     private final PasswordEncoder passwordEncoder;
+    private final SmsCodeService smsCodeService;
+    private final EmailService emailService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -142,5 +146,62 @@ public class UserService implements UserDetailsService {
 
     public boolean existsUserWithPhone(String phone) {
         return userRepository.existsByPhoneNumber(phone);
+    }
+
+    public ResponseEntity<?> sendCodeToDel(String email) {
+        User user = getUserByEmail(email);
+        String code;
+
+        code = smsCodeService.setSmsCode(user.getId());
+
+        emailService.sendEmail(email, "Code to delete account", code);
+
+        return ResponseEntity.ok(StatusResponse.builder()
+                .status(HttpStatus.OK.value())
+                .data(new MessageResponse("Code send to your email!"))
+                .build());
+    }
+
+    public ResponseEntity<?> deleteAccount(DeleteRequest deleteRequest, String email) {
+        User user = getUserByEmail(email);
+        Optional<SmsCode> oSmsCode;
+        SmsCode smsCode;
+
+        if (!passwordEncoder.matches(deleteRequest.getPassword(), user.getPasswordHash())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                            new MessageResponse("Wrong password!")));
+        }
+
+        oSmsCode = smsCodeService.getOSmsCode(user.getId());  //TODO duplicate
+
+        if (oSmsCode.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
+                            new MessageResponse("Code not found!")));
+        }
+
+        smsCode = oSmsCode.get();
+
+        if (!Objects.equals(smsCode.getCode(), deleteRequest.getCode())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                            new MessageResponse("Wrong code!")));
+        }
+
+        if (!smsCodeService.isSmsCodeActual(smsCode)) {
+            smsCodeService.removeSmsCode(smsCode);
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(),
+                            new MessageResponse("Your code has expired!")));
+        }
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok(StatusResponse.builder()
+                .status(HttpStatus.OK.value())
+                .data(new MessageResponse("Account removed!"))
+                .build());
     }
 }

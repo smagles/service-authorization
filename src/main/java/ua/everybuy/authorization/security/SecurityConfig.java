@@ -48,7 +48,9 @@ public class SecurityConfig {
                                 "/auth/change-email",
                                 "/auth/change-phone-number",
                                 "/auth/change-password",
-                                "/auth/get-phone")
+                                "/auth/get-phone",
+                                "/auth/get-code-to-del",
+                                "/auth/delete")
                         .hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
                         .anyRequest().authenticated())
                 .exceptionHandling(basic -> basic.authenticationEntryPoint(customAuthenticationEntryPoint));
