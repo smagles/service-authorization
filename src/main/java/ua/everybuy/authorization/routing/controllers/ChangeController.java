@@ -40,6 +40,10 @@ public class ChangeController {
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 401, \"error\": { \"message\": \"...\" } }")
                     ) }),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = { @Content(mediaType = "application/json",
+                            examples = @ExampleObject("{ \"status\": 404, \"error\": { \"message\": \"... not found!\" } }")
+                    ) }),
             @ApiResponse(responseCode = "409", description = "Conflict, indicating the new email is already in use",
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 409, \"error\": { \"message\": \"Email [email] is already taken\" } }")
@@ -65,6 +69,10 @@ public class ChangeController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - User not found or wrong password or invalid token",
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 401, \"error\": { \"message\": \"...\" } }")
+                    ) }),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = { @Content(mediaType = "application/json",
+                            examples = @ExampleObject("{ \"status\": 404, \"error\": { \"message\": \"... not found!\" } }")
                     ) }),
             @ApiResponse(responseCode = "409", description = "Conflict, the new phone number is already in use by another user",
                     content = { @Content(mediaType = "application/json",

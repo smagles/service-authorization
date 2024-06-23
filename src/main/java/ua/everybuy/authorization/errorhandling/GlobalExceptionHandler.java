@@ -2,7 +2,6 @@ package ua.everybuy.authorization.errorhandling;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,11 +34,19 @@ public class GlobalExceptionHandler {
                         new MessageResponse(errorText.toString().trim())));
     }
 
-    @ExceptionHandler({ExpiredJwtException.class, ServletException.class, UsernameNotFoundException.class})
+    @ExceptionHandler({ExpiredJwtException.class, ServletException.class})
     @ResponseBody
-    public ResponseEntity<?> handleJwtExceptions(ExpiredJwtException e) {
+    public ResponseEntity<?> handleJwtExceptions(Exception e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                        new MessageResponse(e.getMessage())));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<?> userNotFound(UsernameNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
                         new MessageResponse(e.getMessage())));
     }
 }

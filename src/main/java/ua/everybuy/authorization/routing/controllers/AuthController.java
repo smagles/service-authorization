@@ -78,6 +78,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - The provided token is invalid or has expired",
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 401, \"error\": { \"message\": \"...\" } }")
+                    ) }),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = { @Content(mediaType = "application/json",
+                            examples = @ExampleObject("{ \"status\": 404, \"error\": { \"message\": \"... [email] not found!\" } }")
                     ) })
     })
     @GetMapping("/validate")

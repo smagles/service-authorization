@@ -144,19 +144,11 @@ public class PasswordRecoveryService {
     }
 
     public ResponseEntity<?> recoveryPassword(RecoveryRequest recoveryRequest) {
-        Optional<User> oUser =  userService.getOUserByEmail(recoveryRequest.getLogin());
-        User user;
+        User user =  userService.getUserByEmail(recoveryRequest.getLogin());
         Optional<SmsCode> oSmsCode;
         SmsCode smsCode;
         String newPass;
 
-        if (oUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
-                            new MessageResponse("User " + recoveryRequest.getLogin() + " not found!")));
-        }
-
-        user = oUser.get();
         oSmsCode = smsCodeService.getOSmsCode(user.getId());
 
         if (oSmsCode.isEmpty()) {
@@ -181,7 +173,7 @@ public class PasswordRecoveryService {
                             new MessageResponse("Your password reset code has expired!")));
         }
 
-        newPass = genePass();
+        newPass = generatePassword();
 
         emailService.sendEmail(user.getEmail(), "New password", newPass);
 
@@ -195,7 +187,7 @@ public class PasswordRecoveryService {
                 .build());
     }
 
-    private String genePass() {
+    private String generatePassword() {
         StringBuilder pass = new StringBuilder();
         Random random = new Random();
 
