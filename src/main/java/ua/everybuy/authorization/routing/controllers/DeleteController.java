@@ -31,7 +31,7 @@ public class DeleteController {
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 200, \"data\": { \"message\": \"Code send to your email!\" } }")
                     ) }),
-            @ApiResponse(responseCode = "401", description = "Unauthorized - wrong password, invalid token or wrong code",
+            @ApiResponse(responseCode = "401", description = "Unauthorized - invalid token",
                     content = { @Content(mediaType = "application/json",
                             examples = @ExampleObject("{ \"status\": 401, \"error\": { \"message\": \"...\" } }")
                     ) }),
