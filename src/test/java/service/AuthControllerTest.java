@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.everybuy.authorization.buisnesslogic.service.AuthService;
 import ua.everybuy.authorization.buisnesslogic.service.JwtServiceUtils;
+import ua.everybuy.authorization.buisnesslogic.service.SenderToUserService;
 import ua.everybuy.authorization.buisnesslogic.service.UserService;
 import ua.everybuy.authorization.database.entity.User;
 import ua.everybuy.authorization.routing.dtos.*;
@@ -22,16 +23,14 @@ import ua.everybuy.authorization.routing.dtos.*;
 import java.util.Optional;
 
 public class AuthControllerTest {
-
     @Mock
     private UserService userService;
-
     @Mock
     private JwtServiceUtils jwtServiceUtils;
-
     @Mock
     private PasswordEncoder passwordEncoder;
-
+    @Mock
+    private SenderToUserService senderToUserService;
     @InjectMocks
     private AuthService authService;
 
