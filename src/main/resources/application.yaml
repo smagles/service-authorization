@@ -29,3 +29,6 @@ server:
   port: 80
 smsCode:
   lifetime: 30m
+user-service:
+  create-url: ${USER_CREATE_URL}
+  password: ${USER_SERVICE_PASS}

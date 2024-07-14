@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.net.InetAddress;
 import java.sql.Timestamp;
 
 @Getter
@@ -15,16 +16,12 @@ public class AuditLog {
     @Id
     @Column(name = "id", nullable = false)
     private long id;
-    @Basic
     @Column(name = "user_id", nullable = false)
     private long userId;
-    @Basic
     @Column(name = "at", nullable = true)
     private Timestamp at;
-    @Basic
     @Column(name = "ip_v4", nullable = true)
-    private Object ipV4;
-    @Basic
+    private InetAddress ipV4;
     @Column(name = "action_id", nullable = false)
     private long actionId;
 //    @ManyToOne

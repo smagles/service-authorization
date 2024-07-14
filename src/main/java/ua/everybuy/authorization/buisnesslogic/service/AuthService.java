@@ -19,6 +19,7 @@ public class AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtServiceUtils jwtServiceUtils;
+    private final SenderToUserService senderToUserService;
 
     public ResponseEntity<?> registration(RegistrationRequest request) {
         User user = new User();
@@ -41,7 +42,11 @@ public class AuthService {
         user.setPhoneNumber(request.getPhone());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-        token = jwtServiceUtils.generateToken(userService.createNewUser(user));
+        user = userService.createNewUser(user);
+
+        senderToUserService.sendNewUserCreate(user);
+
+        token = jwtServiceUtils.generateToken(user);
 
         return ResponseEntity.ok(StatusResponse.builder()
                 .status(HttpStatus.OK.value())
