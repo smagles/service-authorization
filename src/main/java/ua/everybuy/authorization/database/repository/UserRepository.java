@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     //boolean existsByEmailOrPhoneNumber(String email, String phone);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phone);
+    @Query("SELECT id FROM User")
+    List<Long> getAllUserIds();
 }

@@ -204,4 +204,8 @@ public class UserService implements UserDetailsService {
                 .data(new MessageResponse("Account removed!"))
                 .build());
     }
+
+    public List<Long> getAllUserIds() {
+        return userRepository.getAllUserIds();
+    }
 }

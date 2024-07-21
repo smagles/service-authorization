@@ -20,7 +20,7 @@ public class AuditLog {
     private long userId;
     @Column(name = "at", nullable = true)
     private Timestamp at;
-    @Column(name = "ip_v4", nullable = true)
+    @Column(name = "ip_v4", insertable = false, updatable = false, nullable = true)
     private InetAddress ipV4;
     @Column(name = "action_id", nullable = false)
     private long actionId;

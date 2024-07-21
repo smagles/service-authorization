@@ -44,7 +44,7 @@ public class AuthService {
 
         user = userService.createNewUser(user);
 
-        senderToUserService.sendNewUserCreate(user);
+        senderToUserService.sendNewUserCreate(user.getId());
 
         token = jwtServiceUtils.generateToken(user);
 
