@@ -7,7 +7,6 @@ import ua.everybuy.authorization.database.repository.AuditLogRepository;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,9 +24,5 @@ public class AuditLogService {
         }
         auditLog.setActionId(1L); //TODO
         auditLogRepository.save(auditLog);
-    }
-
-    public List<Long> getSuccessSendUserIds() {
-        return auditLogRepository.findUserIdsByActionId(1L); //TODO
     }
 }

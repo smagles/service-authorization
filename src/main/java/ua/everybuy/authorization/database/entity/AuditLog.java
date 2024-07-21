@@ -18,9 +18,9 @@ public class AuditLog {
     private long id;
     @Column(name = "user_id", nullable = false)
     private long userId;
-    @Column(name = "at", nullable = true)
+    @Column(name = "at", insertable = false, updatable = false, nullable = true)
     private Timestamp at;
-    @Column(name = "ip_v4", insertable = false, updatable = false, nullable = true)
+    @Column(name = "ip_v4", nullable = true)
     private InetAddress ipV4;
     @Column(name = "action_id", nullable = false)
     private long actionId;

@@ -7,8 +7,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -43,19 +45,20 @@ public class SenderToUserService {
                 response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
                 if (response.getStatusCode().value() == 200) {
                     auditLogService.successSendUserIdToUserServ(userId);
-                } //TODO ?
-            } catch (Exception e) {
-                //TODO
+                }
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode() == HttpStatus.CONFLICT) {
+                    auditLogService.successSendUserIdToUserServ(userId);
+                } else {
+                    System.out.println("User-Service response: " + e.getMessage());  //TODO
+                }
             }
         }, executorService);
     }
 
     @Scheduled(cron = "0 0 * * * ?")
     private void scheduledSendUserIds() {
-        List<Long> logUsers = auditLogService.getSuccessSendUserIds();
-        List<Long> users = userService.getAllUserIds();
-
-        users.removeAll(logUsers);
+        List<Long> users = userService.getUserIdsWithoutAction(1L);  //TODO
 
         for (Long u:users) {
             sendNewUserCreate(u);

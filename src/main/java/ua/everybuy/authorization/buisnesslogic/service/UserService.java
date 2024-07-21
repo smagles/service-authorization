@@ -205,7 +205,7 @@ public class UserService implements UserDetailsService {
                 .build());
     }
 
-    public List<Long> getAllUserIds() {
-        return userRepository.getAllUserIds();
+    public List<Long> getUserIdsWithoutAction(Long actionId) {
+        return userRepository.getUsersWithoutAction(actionId);
     }
 }
