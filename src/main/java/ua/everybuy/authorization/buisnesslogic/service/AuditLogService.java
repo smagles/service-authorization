@@ -7,13 +7,14 @@ import ua.everybuy.authorization.database.repository.AuditLogRepository;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
 
-    public void successSendUserIdToUserServ(Long userId) {
+    private void addAuditLog(long userId, long actionId) {
         AuditLog auditLog = new AuditLog();
 
         auditLog.setUserId(userId);
@@ -22,7 +23,27 @@ public class AuditLogService {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e); //TODO
         }
-        auditLog.setActionId(1L); //TODO
+        auditLog.setActionId(actionId);
         auditLogRepository.save(auditLog);
+    }
+
+    public void successSendUserIdToUserServ(long userId) {
+        addAuditLog(userId, 1L); //TODO
+    }
+
+    public void successSendRemoveUserIdToUserServ(long userId) {
+        addAuditLog(userId, 2L); //TODO
+    }
+
+    public void successRemoveUserAccount(long userId) {
+        addAuditLog(userId, 3L); //TODO
+    }
+
+    public List<Long> getUserIdsWithActAndWithoutAct(long haveActId, long haventActId) {
+        return auditLogRepository.getUserIdsWithActAndWithoutAct(haveActId, haventActId);
+    }
+
+    public List<Long> getUserIdsWithoutAction(Long actionId) {
+        return auditLogRepository.getUsersWithoutAction(actionId);
     }
 }

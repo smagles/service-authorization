@@ -3,11 +3,9 @@ package ua.everybuy.authorization.database.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.everybuy.authorization.database.entity.User;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,6 +17,4 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     //boolean existsByEmailOrPhoneNumber(String email, String phone);
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phone);
-    @Query("SELECT id FROM User WHERE id not in(SELECT userId FROM AuditLog WHERE actionId = :actionId)")
-    List<Long> getUsersWithoutAction(@Param("actionId") Long actionId);
 }

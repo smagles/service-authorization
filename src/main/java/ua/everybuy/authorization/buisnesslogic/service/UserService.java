@@ -28,6 +28,8 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final SmsCodeService smsCodeService;
     private final EmailService emailService;
+    private final AuditLogService auditLogService;
+    private final SenderToUserService senderToUserService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -197,15 +199,13 @@ public class UserService implements UserDetailsService {
                             new MessageResponse("Your code has expired!")));
         }
 
+        auditLogService.successRemoveUserAccount(user.getId());
+        senderToUserService.sendUserRemove(user.getId());
         userRepository.delete(user);
 
         return ResponseEntity.ok(StatusResponse.builder()
                 .status(HttpStatus.OK.value())
                 .data(new MessageResponse("Account removed!"))
                 .build());
-    }
-
-    public List<Long> getUserIdsWithoutAction(Long actionId) {
-        return userRepository.getUsersWithoutAction(actionId);
     }
 }

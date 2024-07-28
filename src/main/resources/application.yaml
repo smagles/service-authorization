@@ -31,4 +31,5 @@ smsCode:
   lifetime: 30m
 user-service:
   create-url: ${USER_CREATE_URL}
+  remove-url: ${USER_REMOVE_URL}
   password: ${USER_SERVICE_PASS}
