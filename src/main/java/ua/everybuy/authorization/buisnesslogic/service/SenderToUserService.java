@@ -79,7 +79,7 @@ public class SenderToUserService {
         }, executorService);
     }
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 3 * * ?")
     private void scheduledSendUserIds() {
         List<Long> users = auditLogService.getUserIdsWithoutAction(1L);  //TODO
 
@@ -88,7 +88,7 @@ public class SenderToUserService {
         }
     }
 
-    @Scheduled(cron = "0 30 * * * ?")
+    @Scheduled(cron = "0 30 3 * * ?")
     private void scheduledSendRemovedUserIds() {
         List<Long> users = auditLogService.getUserIdsWithActAndWithoutAct(3L, 2L);  //TODO
 
