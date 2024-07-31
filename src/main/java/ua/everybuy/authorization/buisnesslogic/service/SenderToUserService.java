@@ -1,6 +1,7 @@
 package ua.everybuy.authorization.buisnesslogic.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
 @Service
 @RequiredArgsConstructor
 public class SenderToUserService {
+    @Autowired
     private RestTemplate restTemplate;
     private final AuditLogService auditLogService;
     private final static String USER_SERVES_PASS_HEADER_PREFIX = "Service-Password";
