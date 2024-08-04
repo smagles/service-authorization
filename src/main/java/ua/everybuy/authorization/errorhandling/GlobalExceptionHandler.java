@@ -53,7 +53,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
-    public ErrorResponse handleValidationExceptions(HttpMessageNotReadableException e) {
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), new MessageResponse("Required request body is missing"));
+    public ResponseEntity<?> handleValidationExceptions(HttpMessageNotReadableException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
+                        new MessageResponse("Required request body is missing")));
     }
 }
