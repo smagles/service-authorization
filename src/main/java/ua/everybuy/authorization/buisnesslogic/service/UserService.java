@@ -43,6 +43,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public Optional<User> getOUserByLogin(String login) {
+        return userRepository.findUserByLogin(login);
+    }
+
     public Optional<User> getOUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }

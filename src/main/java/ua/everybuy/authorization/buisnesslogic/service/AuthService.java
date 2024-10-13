@@ -55,7 +55,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> authorization(AuthRequest authRequest) {
-        Optional<User> user = userService.getOUserByEmail(authRequest.getLogin());
+        Optional<User> user = userService.getOUserByLogin(authRequest.getLogin());
         String token;
 
         if (user.isEmpty() || !passwordEncoder.matches(authRequest.getPassword(), user.get().getPasswordHash())) {
