@@ -88,7 +88,7 @@ public class AuthControllerTest {
         Optional<User> oUser = Optional.of(getUserSupplier.get());
         User user = oUser.get();
 
-        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+        when(userService.getOUserByLogin(authRequest.getLogin())).thenReturn(oUser);
         when(passwordEncoder.matches(authRequest.getPassword(), user.getPasswordHash())).thenReturn(true);
         when(jwtServiceUtils.generateToken(user)).thenReturn(TOKEN);
 
@@ -104,7 +104,7 @@ public class AuthControllerTest {
         Optional<User> oUser = Optional.of(getUserSupplier.get());
         User user = oUser.get();
 
-        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+        when(userService.getOUserByLogin(authRequest.getLogin())).thenReturn(oUser);
         when(passwordEncoder.matches(authRequest.getPassword(), user.getPasswordHash())).thenReturn(false);
 
         ResponseEntity<?> response = authService.authorization(authRequest);
@@ -118,7 +118,7 @@ public class AuthControllerTest {
         AuthRequest authRequest = getAuthRequestSupplier.get();
         Optional<User> oUser = Optional.empty();
 
-        when(userService.getOUserByEmail(authRequest.getLogin())).thenReturn(oUser);
+        when(userService.getOUserByLogin(authRequest.getLogin())).thenReturn(oUser);
 
         ResponseEntity<?> response = authService.authorization(authRequest);
 
