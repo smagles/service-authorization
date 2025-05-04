@@ -24,7 +24,7 @@ spring:
             enable: true
 jwt:
   secret: ${SECRET_KEY}
-  lifetime: 1d
+  lifetime: 7d
 server:
   port: 80
 smsCode:
