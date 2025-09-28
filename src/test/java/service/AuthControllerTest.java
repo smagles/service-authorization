@@ -18,6 +18,7 @@ import ua.everybuy.authorization.buisnesslogic.service.JwtServiceUtils;
 import ua.everybuy.authorization.buisnesslogic.service.SenderToUserService;
 import ua.everybuy.authorization.buisnesslogic.service.UserService;
 import ua.everybuy.authorization.database.entity.User;
+import ua.everybuy.authorization.errorhandling.AuthProviderValidator;
 import ua.everybuy.authorization.routing.dtos.*;
 
 import java.util.Optional;
@@ -31,6 +32,8 @@ public class AuthControllerTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private SenderToUserService senderToUserService;
+    @Mock
+    private AuthProviderValidator authProviderValidator;
     @InjectMocks
     private AuthService authService;
 
