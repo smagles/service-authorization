@@ -7,8 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.everybuy.authorization.database.entity.User;
+import ua.everybuy.authorization.errorhandling.AuthProviderValidator;
 import ua.everybuy.authorization.routing.dtos.*;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +20,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtServiceUtils jwtServiceUtils;
     private final SenderToUserService senderToUserService;
+    private final AuthProviderValidator authProviderValidator;
 
     public ResponseEntity<?> registration(RegistrationRequest request) {
         User user = new User();
@@ -58,10 +59,13 @@ public class AuthService {
         Optional<User> user = userService.getOUserByLogin(authRequest.getLogin());
         String token;
 
+        user.ifPresent(authProviderValidator::validateUserCanLoginWithPassword);
+
         if (user.isEmpty() || !passwordEncoder.matches(authRequest.getPassword(), user.get().getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                            new MessageResponse("User " + authRequest.getLogin() + " not found or wrong password!"))); //TODO
+                            new MessageResponse("User " + authRequest.getLogin()
+                                    + " not found or wrong password!"))); //TODO
         }
 
         token = jwtServiceUtils.generateToken(user.get());

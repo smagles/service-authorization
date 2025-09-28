@@ -1,7 +1,6 @@
 package ua.everybuy.authorization.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ua.everybuy.authorization.buisnesslogic.service.CustomOAuth2UserService;
 import ua.everybuy.authorization.database.entity.RoleList;
 import ua.everybuy.authorization.buisnesslogic.service.UserService;
 
@@ -28,35 +28,60 @@ public class SecurityConfig {
     private final UserService userService;
     private final JwtRequestFilter jwtRequestFilter;
     private final PasswordEncoder passwordEncoder;
-    @Autowired
-    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(c -> corsConfigurationSource())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/auth",
+                        .requestMatchers(
+                                "/auth/auth",
                                 "/auth/registration",
                                 "/auth/get-recovery-code",
                                 "/auth/recovery-password",
                                 "/auth/keep-alive",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/auth/validate",
+                                "/v3/api-docs/**",
+                                "/auth/google/callback",
+                                "/auth/login/google",
+                                "/oauth2/**",
+                                "/auth/google/success",
+                                "/auth/google/error"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/auth/validate",
                                 "/auth/change-email",
                                 "/auth/change-phone-number",
                                 "/auth/change-password",
                                 "/auth/get-phone",
                                 "/auth/get-code-to-del",
-                                "/auth/delete")
-                        .hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
-                        .anyRequest().authenticated())
-                .exceptionHandling(basic -> basic.authenticationEntryPoint(customAuthenticationEntryPoint));
+                                "/auth/delete"
+                        ).hasAnyAuthority(RoleList.USER.name(), RoleList.ADMIN.name())
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(basic -> basic.authenticationEntryPoint(customAuthenticationEntryPoint))
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorization")
+                        )
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/auth/google/callback")
+                        )
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(oauth2AuthenticationSuccessHandler)
+                        .failureHandler(oauth2AuthenticationFailureHandler)
+                );
+
         return http.build();
     }
 

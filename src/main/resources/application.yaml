@@ -22,6 +22,20 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/auth/google/callback"
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
 jwt:
   secret: ${SECRET_KEY}
   lifetime: 7d
@@ -31,5 +45,6 @@ smsCode:
   lifetime: 30m
 user-service:
   create-url: ${USER_CREATE_URL}
+  create-from-google-url: ${USER_CREATE_FROM_GOOGLE_URL}
   remove-url: ${USER_REMOVE_URL}
   password: ${USER_SERVICE_PASS}

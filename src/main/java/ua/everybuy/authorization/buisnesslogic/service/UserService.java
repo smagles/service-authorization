@@ -8,9 +8,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ua.everybuy.authorization.database.entity.AuthProvider;
 import ua.everybuy.authorization.database.entity.SmsCode;
 import ua.everybuy.authorization.database.entity.User;
 import ua.everybuy.authorization.database.repository.UserRepository;
+import ua.everybuy.authorization.errorhandling.AuthProviderValidator;
 import ua.everybuy.authorization.routing.dtos.*;
 
 import java.sql.Timestamp;
@@ -30,6 +32,7 @@ public class UserService implements UserDetailsService {
     private final EmailService emailService;
     private final AuditLogService auditLogService;
     private final SenderToUserService senderToUserService;
+    private final AuthProviderValidator authProviderValidator;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -58,6 +61,8 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> changeEmail(String login, ChangeEmailRequest changeEmailRequest) {
         User user = getUserByEmail(login);
 
+        authProviderValidator.validateUserCanChangeEmail(user);
+
         if (!passwordEncoder.matches(changeEmailRequest.getPassword(), user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
@@ -82,16 +87,35 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> changePhoneNumber(String login, ChangePhoneRequest changePhoneRequest) {
         User user = getUserByEmail(login);
 
-        if (!passwordEncoder.matches(changePhoneRequest.getPassword(), user.getPasswordHash())) {
+        boolean authenticated = false;
+        String credential = changePhoneRequest.getPassword();
+
+        if (passwordEncoder.matches(credential, user.getPasswordHash())) {
+            authenticated = true;
+        }
+
+        if (!authenticated) {
+            SmsCode smsCode = smsCodeService.getOSmsCode(user.getId());
+            if (Objects.equals(smsCode.getCode(), credential)
+                    && smsCodeService.isSmsCodeActual(smsCode)) {
+                authenticated = true;
+                smsCodeService.removeSmsCode(smsCode);
+
+            }
+        }
+
+        if (!authenticated) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                            new MessageResponse("Wrong password!")));
+                            new MessageResponse("Wrong password or code!")));
         }
 
         if (existsUserWithPhone(changePhoneRequest.getNewPhoneNumber())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(HttpStatus.CONFLICT.value(),
-                            new MessageResponse("Phone number " + changePhoneRequest.getNewPhoneNumber() + " is already taken")));
+                            new MessageResponse("Phone number "
+                                    + changePhoneRequest.getNewPhoneNumber()
+                                    + " is already taken")));
         }
 
         user.setPhoneNumber(changePhoneRequest.getNewPhoneNumber());
@@ -103,8 +127,23 @@ public class UserService implements UserDetailsService {
                 .build());
     }
 
+    public ResponseEntity<?> sendCodeToChangePhone(String email) {
+        User user = getUserByEmail(email);
+        String code;
+        code = smsCodeService.setSmsCode(user.getId());
+        emailService.sendEmail(email, "Code to change phone number", code);
+
+        return ResponseEntity.ok(StatusResponse.builder()
+                .status(HttpStatus.OK.value())
+                .data(new MessageResponse("Code send to your email!"))
+                .build());
+    }
+
+
     public ResponseEntity<?> changePassword(String login, ChangePasswordRequest changePasswordRequest) {
         User user = getUserByEmail(login);
+
+        authProviderValidator.validateUserCanChangePassword(user);
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -170,24 +209,21 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity<?> deleteAccount(DeleteRequest deleteRequest, String email) {
         User user = getUserByEmail(email);
-        Optional<SmsCode> oSmsCode;
+
+        SmsCode oSmsCode;
         SmsCode smsCode;
 
-        if (!passwordEncoder.matches(deleteRequest.getPassword(), user.getPasswordHash())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                            new MessageResponse("Wrong password!")));
+        if (AuthProvider.LOCAL.equals(user.getAuthProvider())) {
+            if (!passwordEncoder.matches(deleteRequest.getPassword(), user.getPasswordHash())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                                new MessageResponse("Wrong password!")));
+            }
         }
 
         oSmsCode = smsCodeService.getOSmsCode(user.getId());  //TODO duplicate
 
-        if (oSmsCode.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
-                            new MessageResponse("Code not found!")));
-        }
-
-        smsCode = oSmsCode.get();
+        smsCode = oSmsCode;
 
         if (!Objects.equals(smsCode.getCode(), deleteRequest.getCode())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -212,4 +248,5 @@ public class UserService implements UserDetailsService {
                 .data(new MessageResponse("Account removed!"))
                 .build());
     }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.everybuy.authorization.database.entity.SmsCode;
 import ua.everybuy.authorization.database.entity.User;
+import ua.everybuy.authorization.errorhandling.AuthProviderValidator;
 import ua.everybuy.authorization.routing.dtos.*;
 
 import java.util.Objects;
@@ -19,6 +20,7 @@ public class PasswordRecoveryService {
     private final UserService userService;
     private final JwtServiceUtils jwtServiceUtils;
     private final EmailService emailService;
+    private final AuthProviderValidator authProviderValidator;
     private static final short ASCII_CHARS_START = 33;
     private static final short ASCII_CHARS_COUNT = 93;
     private static final short ASCII_NUMBERS_START = 48;
@@ -145,19 +147,15 @@ public class PasswordRecoveryService {
 
     public ResponseEntity<?> recoveryPassword(RecoveryRequest recoveryRequest) {
         User user =  userService.getUserByEmail(recoveryRequest.getLogin());
-        Optional<SmsCode> oSmsCode;
+        authProviderValidator.validateUserCanChangePassword(user);
+
+        SmsCode oSmsCode;
         SmsCode smsCode;
         String newPass;
 
         oSmsCode = smsCodeService.getOSmsCode(user.getId());
 
-        if (oSmsCode.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
-                            new MessageResponse("Code not found!")));
-        }
-
-        smsCode = oSmsCode.get();
+        smsCode = oSmsCode;
 
         if (!Objects.equals(smsCode.getCode(), recoveryRequest.getCode())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

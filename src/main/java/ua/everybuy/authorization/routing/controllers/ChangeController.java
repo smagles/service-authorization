@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -109,5 +110,10 @@ public class ChangeController {
     public ResponseEntity<?> changePassword(Principal principal,
                                             @RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return service.changePassword(principal.getName(), changePasswordRequest);
+    }
+
+    @GetMapping("/get-code-to-change-phone")
+    public ResponseEntity<?> getCodeToChangePhone(Principal principal) {
+        return service.sendCodeToChangePhone(principal.getName());
     }
 }

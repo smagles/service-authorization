@@ -1,17 +1,15 @@
 package ua.everybuy.authorization.buisnesslogic.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.everybuy.authorization.database.entity.SmsCode;
 import ua.everybuy.authorization.database.repository.SmsCodeRepository;
-
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Random;
-
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +33,9 @@ public class SmsCodeService {
         return code;
     }
 
-    public Optional<SmsCode> getOSmsCode(Long userId) {
-        return smsCodeRepository.findByUsersId(userId);
+    public SmsCode getOSmsCode(Long userId) {
+        return smsCodeRepository.findByUsersId(userId)
+                .orElseThrow(()-> new EntityNotFoundException("Code not found!"));
     }
 
     public boolean isSmsCodeActual(SmsCode smsCode) {

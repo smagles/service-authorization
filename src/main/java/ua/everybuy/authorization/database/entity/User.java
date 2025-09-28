@@ -5,7 +5,6 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -38,6 +37,10 @@ public class User implements UserDetails {
     @Basic
     @Column(name = "password_reset_at", insertable = false, nullable = true)
     private Timestamp passwordResetAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false, length = 10)
+    private AuthProvider authProvider = AuthProvider.LOCAL;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -83,7 +86,7 @@ public class User implements UserDetails {
 //    @OneToMany(mappedBy = "usersByUserId")
 //    private Collection<UserRoles> userRolesById;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", schema = "auth",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

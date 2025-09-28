@@ -1,6 +1,7 @@
 package ua.everybuy.authorization.errorhandling;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,14 @@ public class GlobalExceptionHandler {
                         new MessageResponse(e.getMessage())));
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<?> entityNotFound(EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
+                        new MessageResponse(e.getMessage())));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ResponseEntity<?> handleValidationExceptions(HttpMessageNotReadableException e) {
@@ -58,4 +67,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
                         new MessageResponse("Required request body is missing")));
     }
+
+    @ExceptionHandler(AuthProviderValidationException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleAuthProviderValidationException(AuthProviderValidationException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(),
+                        new MessageResponse(ex.getMessage())));
+    }
+
 }
