@@ -48,3 +48,12 @@ user-service:
   create-from-google-url: ${USER_CREATE_FROM_GOOGLE_URL}
   remove-url: ${USER_REMOVE_URL}
   password: ${USER_SERVICE_PASS}
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
