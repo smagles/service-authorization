@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 @Component
@@ -22,12 +24,20 @@ public class OAuth2AuthenticationFailureHandler implements AuthenticationFailure
 
         String errorMessage = "OAuth2 Authentication failed";
 
-        if (exception instanceof OAuth2AuthenticationException) {
-            OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
-            errorMessage = error.getDescription();
+        if (exception instanceof OAuth2AuthenticationException oauth2Ex) {
+            OAuth2Error error = oauth2Ex.getError();
+
+            if (error.getDescription() != null && !error.getDescription().isBlank()) {
+                errorMessage = error.getDescription();
+            } else if (error.getErrorCode() != null) {
+                errorMessage = "OAuth2 error: " + error.getErrorCode();
+            }
+        } else if (exception.getMessage() != null) {
+            errorMessage = exception.getMessage();
         }
 
-        String redirectUrl = ERROR_REDIRECT_URL + errorMessage;
+        String redirectUrl = ERROR_REDIRECT_URL + URLEncoder
+                .encode(errorMessage, StandardCharsets.UTF_8);
         response.sendRedirect(redirectUrl);
     }
 }
