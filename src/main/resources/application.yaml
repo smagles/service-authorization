@@ -42,6 +42,15 @@ spring:
         cookie:
           same-site: none
           secure: true
+
+  data:
+    redis:
+      url: ${REDIS_URL}
+
+  session:
+    store-type: redis
+    timeout: 30m
+
 jwt:
   secret: ${SECRET_KEY}
   lifetime: 7d
