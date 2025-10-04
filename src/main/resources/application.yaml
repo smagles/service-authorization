@@ -32,10 +32,16 @@ spring:
             scope:
               - email
               - profile
-            redirect-uri: "https://service-authorization-kog6.onrender.com/auth/google/callback"
+            redirect-uri: "{baseUrl}/auth/google/callback"
         provider:
           google:
             issuer-uri: https://accounts.google.com
+  server:
+    servlet:
+      session:
+        cookie:
+          same-site: none
+          secure: true
 jwt:
   secret: ${SECRET_KEY}
   lifetime: 7d
@@ -52,7 +58,7 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2: TRACE
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
